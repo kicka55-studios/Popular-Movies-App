@@ -19,8 +19,7 @@
             android:minHeight="250dp"
             android:minWidth="180dp"
             android:scaleType="centerCrop"
-            tools:background="#000000"
-            />
+            tools:background="#ffdfdfdf" />
 
         <TextView
             android:id="@+id/movie_rating"
