@@ -2,7 +2,6 @@ package in.kicka55studios.popularmovies;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -21,9 +20,8 @@ import java.util.Vector;
 
 import in.kicka55studios.popularmovies.data.MoviesContract;
 import in.kicka55studios.popularmovies.data.MoviesContract.MoviesEntry;
-import in.kicka55studios.popularmovies.data.MoviesDbHelper;
 
-public class FetchMoviesTask extends AsyncTask<String, Void, String[]> {
+public class FetchMoviesTask extends AsyncTask<String, Void, Void> {
 
     private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
     private final Context mContext;
@@ -33,7 +31,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, String[]> {
     }
 
 
-    private String[] getMoviesFromJson(String moviesJsonStr) {
+    private void getMoviesFromJson(String moviesJsonStr) {
 
         final String TMDB_RESULTS = "results";
 
@@ -67,8 +65,8 @@ public class FetchMoviesTask extends AsyncTask<String, Void, String[]> {
                 JSONObject movieObject = moviesArray.getJSONObject(i);
 
                 String dateStr = movieObject.getString(TMDB_DATE);
-                int movieId = movieObject.getInt(TMDB_MOVIE_ID);
-                int votes = movieObject.getInt(TMDB_VOTES);
+                long movieId = movieObject.getInt(TMDB_MOVIE_ID);
+                long votes = movieObject.getInt(TMDB_VOTES);
                 String title = movieObject.getString(TMDB_TITLE);
                 String overview = movieObject.getString(TMDB_OVERVIEW);
                 double popularity = movieObject.getDouble(TMDB_POPULARITY);
@@ -89,35 +87,21 @@ public class FetchMoviesTask extends AsyncTask<String, Void, String[]> {
             }
 
 
-            int returnCount = 0;
+            int inserted = 0;
             if (cVector.size() > 0) {
-                SQLiteDatabase db = new MoviesDbHelper(mContext).getWritableDatabase();
-                db.beginTransaction();
-                try {
-                    ContentValues[] cArray = new ContentValues[cVector.size()];
-                    cVector.toArray(cArray);
-                    for (ContentValues value : cArray) {
-                        long _id = db.insert(MoviesEntry.TABLE_NAME, null, value);
-                        if (_id != -1) {
-                            returnCount++;
-                        }
-                    }
-                    db.setTransactionSuccessful();
-                } finally {
-                    db.endTransaction();
-                    Log.i(LOG_TAG, returnCount + " successful inserts.");
-                }
-            }
+                ContentValues[] cArray = new ContentValues[cVector.size()];
+                cVector.toArray(cArray);
 
-            return moviesList;
+                inserted = mContext.getContentResolver().bulkInsert(MoviesEntry.CONTENT_URI, cArray);
+            }
+            Log.d(LOG_TAG, "Fetch Movies Task completed, " + inserted + " successful inserts.");
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return null;
     }
 
     @Override
-    protected String[] doInBackground(String... params) {
+    protected Void doInBackground(String... params) {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
 
@@ -160,7 +144,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, String[]> {
             }
 
             moviesJsonStr = buffer.toString();
-            return getMoviesFromJson(moviesJsonStr);
+            getMoviesFromJson(moviesJsonStr);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -177,19 +161,5 @@ public class FetchMoviesTask extends AsyncTask<String, Void, String[]> {
             }
         }
         return null;
-    }
-
-    @Override
-    protected void onPostExecute(String[] strings) {
-        super.onPostExecute(strings);
-
-        MoviesFragment.mMoviesAdapter.clear();
-        for (String movie : strings) {
-            MoviesFragment.mMoviesAdapter.add(movie);
-        }
-
-        MoviesFragment.listItems = strings;
-
-
     }
 }

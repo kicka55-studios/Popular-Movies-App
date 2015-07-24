@@ -24,7 +24,7 @@ public class MoviesProvider extends ContentProvider {
         matcher.addURI(authority, MoviesContract.PATH_MOVIES, MOVIES);
         matcher.addURI(authority, MoviesContract.PATH_POPULARITY, MOVIES_POPULARITY);
         matcher.addURI(authority, MoviesContract.PATH_RATING, MOVIES_RATING);
-        matcher.addURI(authority, MoviesContract.PATH_MOVIES + "/*", MOVIES_WITH_ID);
+        matcher.addURI(authority, MoviesContract.PATH_MOVIES + "/#", MOVIES_WITH_ID);
 
         return matcher;
 
@@ -83,7 +83,7 @@ public class MoviesProvider extends ContentProvider {
                 );
                 break;
             }
-            // "movies/*"
+            // "movies/#"
             case MOVIES_WITH_ID: {
                 String id = uri.getPathSegments().get(1);
                 retCursor = mOpenHelper.getWritableDatabase().query(
