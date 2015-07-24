@@ -1,28 +1,23 @@
 package in.kicka55studios.popularmovies;
 
-import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import in.kicka55studios.popularmovies.data.MoviesContract;
-import in.kicka55studios.popularmovies.data.MoviesDbHelper;
 
-public class MoviesFragment extends Fragment {
+public class MoviesFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    public static ArrayAdapter<String> mMoviesAdapter;
-    public static String[] listItems;
-    List<String> list = null;
+    private static final int MOVIES_LOADER = 0;
+    public static MoviesAdapter mMoviesAdapter;
     private ListView movieListView;
 
 
@@ -33,37 +28,12 @@ public class MoviesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        String[] listItems = {
-                "Alpha",
-                "Beta",
-                "Gamma",
-        };
-
-
-        List<String> weekForecast = new ArrayList<String>(Arrays.asList(listItems));
-
-        mMoviesAdapter =
-                new ArrayAdapter<String>(
-                        getActivity(),
-                        R.layout.list_item_movies,
-                        R.id.movies_list_item,
-                        weekForecast);
-
-
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        ListView listView = (ListView) rootView.findViewById(R.id.movies_list_view);
-        listView.setAdapter(mMoviesAdapter);
-        getData();
+        mMoviesAdapter = new MoviesAdapter(getActivity(), null, 0);
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String txt = (String) parent.getItemAtPosition(position);
-                String segments[] = txt.split("-");
-                startActivity(new Intent(getActivity(), Details.class).putExtra(Intent.EXTRA_TEXT, segments[0].trim()));
-            }
-        });
+        movieListView = (ListView) rootView.findViewById(R.id.movies_list_view);
+        movieListView.setAdapter(mMoviesAdapter);
 
         return rootView;
     }
@@ -77,36 +47,60 @@ public class MoviesFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        updateMovies();
+    }
 
-        String pref_sort = Utility.getPreferredSort(getActivity());
-        new FetchMoviesTask(getActivity()).execute(pref_sort);
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        getLoaderManager().initLoader(MOVIES_LOADER, null, this);
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    private void updateMovies() {
+        FetchMoviesTask moviesTask = new FetchMoviesTask(getActivity());
+        String sort = Utility.getPreferredSort(getActivity());
+        moviesTask.execute(sort);
     }
 
 
-    public void getData() {
+//    public void getData() {
+//
+//        String sortPref = Utility.getPreferredSort(getActivity());
+//
+//        Cursor c = null;
+//        Uri uri = null;
+//
+//        if (sortPref.equals(getString(R.string.pref_sort_popularity))) {
+//            uri = MoviesContract.BASE_CONTENT_URI.buildUpon().appendPath(MoviesContract.PATH_POPULARITY).build();
+//        } else {
+//            uri = MoviesContract.BASE_CONTENT_URI.buildUpon().appendPath(MoviesContract.PATH_RATING).build();
+//        }
+//        c = getActivity().getContentResolver().query(uri, null, null, null, null);
+//
+//        mMoviesAdapter = new MoviesAdapter(getActivity(), c, 0);
+//    }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         String sortPref = Utility.getPreferredSort(getActivity());
 
-        Cursor c = null;
+        Uri uri = null;
 
         if (sortPref.equals(getString(R.string.pref_sort_popularity))) {
-            c = new MoviesDbHelper(getActivity()).getReadableDatabase().query(MoviesContract.MoviesEntry.TABLE_NAME,
-                    null, null, null, null, null, MoviesContract.MoviesEntry.COLUMN_POPULARITY + " DESC");
+            uri = MoviesContract.MoviesEntry.CONTENT_URI.buildUpon().appendPath(MoviesContract.POPULARITY).build();
         } else {
-            c = new MoviesDbHelper(getActivity()).getReadableDatabase().query(MoviesContract.MoviesEntry.TABLE_NAME,
-                    null, MoviesContract.MoviesEntry.COLUMN_VOTES + " > ?", new String[]{"1000"}, null, null, MoviesContract.MoviesEntry.COLUMN_RATING + " DESC");
+            uri = MoviesContract.MoviesEntry.CONTENT_URI.buildUpon().appendPath(MoviesContract.RATING).build();
         }
+        return new CursorLoader(getActivity(), uri, null, null, null, null);
+    }
 
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        mMoviesAdapter.swapCursor(cursor);
+    }
 
-        int INDEX_ID = c.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_MOVIE_ID);
-        int INDEX_TITLE = c.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_TITLE);
-        int i = 0;
-        mMoviesAdapter.clear();
-        c.moveToFirst();
-        while (!c.isAfterLast()) {
-            mMoviesAdapter.add(c.getInt(INDEX_ID) + " - " + c.getString(INDEX_TITLE));
-            c.moveToNext();
-            i++;
-        }
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mMoviesAdapter.swapCursor(null);
     }
 }

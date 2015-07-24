@@ -49,13 +49,13 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Void> {
         final String TMDB_VOTES = "vote_count";
         final String TMDB_DATE = "release_date";
 
-        String moviesList[] = null;
+//        String moviesList[] = null;
 
         try {
             JSONObject moviesJson = new JSONObject(moviesJsonStr);
             JSONArray moviesArray = moviesJson.getJSONArray(TMDB_RESULTS);
 
-            moviesList = new String[moviesArray.length()];
+//            moviesList = new String[moviesArray.length()];
 
             Vector<ContentValues> cVector = new Vector<ContentValues>(moviesArray.length());
 
@@ -81,7 +81,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Void> {
                 values.put(MoviesEntry.COLUMN_RELEASE_DATE, dateStr);
                 values.put(MoviesEntry.COLUMN_VOTES, votes);
                 values.put(MoviesEntry.COLUMN_POSTER_PATH, POSTER_PATH_PREFIX + POSTER_SIZE + posterPath + API_PARAM + MoviesContract.API_KEY);
-                moviesList[i] = movieId + " - " + title;
+//                moviesList[i] = movieId + " - " + title;
 
                 cVector.add(values);
             }
