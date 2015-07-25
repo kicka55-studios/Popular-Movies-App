@@ -1,5 +1,6 @@
 package in.kicka55studios.popularmovies;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,13 +11,23 @@ import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import in.kicka55studios.popularmovies.data.MoviesContract;
 
 public class MoviesFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    static final int COL_ID = 0;
+    static final int COL_MOVIE_ID = 1;
+    static final int COL_MOVIE_TITLE = 2;
+    private static final String[] MOVIES_COLUMNS = {
+            MoviesContract.MoviesEntry._ID,
+            MoviesContract.MoviesEntry.COLUMN_MOVIE_ID,
+            MoviesContract.MoviesEntry.COLUMN_TITLE,
+    };
     private static final int MOVIES_LOADER = 0;
+
     public static MoviesAdapter mMoviesAdapter;
     private ListView movieListView;
 
@@ -35,19 +46,23 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
         movieListView = (ListView) rootView.findViewById(R.id.movies_list_view);
         movieListView.setAdapter(mMoviesAdapter);
 
+        movieListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+                if (cursor != null) {
+                    Intent intent = new Intent(getActivity(), Details.class).setData(MoviesContract.MoviesEntry.buildMovieWithId(cursor.getLong(COL_MOVIE_ID)));
+                    startActivity(intent);
+                }
+            }
+        });
+
         return rootView;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-    }
-
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        updateMovies();
     }
 
     @Override
@@ -62,23 +77,10 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
         moviesTask.execute(sort);
     }
 
-
-//    public void getData() {
-//
-//        String sortPref = Utility.getPreferredSort(getActivity());
-//
-//        Cursor c = null;
-//        Uri uri = null;
-//
-//        if (sortPref.equals(getString(R.string.pref_sort_popularity))) {
-//            uri = MoviesContract.BASE_CONTENT_URI.buildUpon().appendPath(MoviesContract.PATH_POPULARITY).build();
-//        } else {
-//            uri = MoviesContract.BASE_CONTENT_URI.buildUpon().appendPath(MoviesContract.PATH_RATING).build();
-//        }
-//        c = getActivity().getContentResolver().query(uri, null, null, null, null);
-//
-//        mMoviesAdapter = new MoviesAdapter(getActivity(), c, 0);
-//    }
+    public void onSortChanged() {
+        updateMovies();
+        getLoaderManager().restartLoader(MOVIES_LOADER, null, this);
+    }
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
@@ -91,7 +93,7 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
         } else {
             uri = MoviesContract.MoviesEntry.CONTENT_URI.buildUpon().appendPath(MoviesContract.RATING).build();
         }
-        return new CursorLoader(getActivity(), uri, null, null, null, null);
+        return new CursorLoader(getActivity(), uri, MOVIES_COLUMNS, null, null, null);
     }
 
     @Override

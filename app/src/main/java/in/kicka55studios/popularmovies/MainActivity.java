@@ -9,12 +9,37 @@ import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
 
+    private final String MOVIESFRAGMENT_TAG = "MFTAG";
+    private String mSortType;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        mSortType = Utility.getPreferredSort(this);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction().add(R.id.container,
+                    new MoviesFragment(),
+                    MOVIESFRAGMENT_TAG)
+                    .commit();
+        }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String sortOrder = Utility.getPreferredSort(this);
+
+        if (!sortOrder.equals(mSortType)) {
+            MoviesFragment mf = (MoviesFragment) getSupportFragmentManager().findFragmentByTag(MOVIESFRAGMENT_TAG);
+            if (mf != null) {
+                mf.onSortChanged();
+            }
+            mSortType = sortOrder;
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

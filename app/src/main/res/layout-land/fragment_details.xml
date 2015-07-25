@@ -16,10 +16,10 @@
             android:id="@+id/movie_poster"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="#ffdfdfdf"
             android:minHeight="250dp"
             android:minWidth="180dp"
-            android:scaleType="centerCrop"
-            tools:background="#ffdfdfdf" />
+            android:scaleType="centerCrop" />
 
         <TextView
             android:id="@+id/movie_rating"
@@ -28,7 +28,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginTop="30dp"
             android:layout_toRightOf="@+id/movie_poster"
-            android:text="Rating" />
+            tools:text="Rating" />
 
         <TextView
             android:id="@+id/movie_title"
@@ -38,8 +38,8 @@
             android:layout_marginLeft="20dp"
             android:layout_marginTop="10dp"
             android:layout_toRightOf="@+id/movie_poster"
-            android:text="Title"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            tools:text="Title" />
 
         <TextView
             android:id="@+id/movie_overview"
@@ -49,7 +49,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginTop="5dp"
             android:layout_toRightOf="@+id/movie_poster"
-            android:text="Overview" />
+            tools:text="Overview" />
 
     </RelativeLayout>
 

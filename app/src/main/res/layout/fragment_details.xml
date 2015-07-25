@@ -28,7 +28,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginTop="30dp"
             android:layout_toRightOf="@+id/movie_poster"
-            android:text="Rating" />
+            tools:text="Rating" />
 
         <TextView
             android:id="@+id/movie_title"
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/movie_poster"
             android:layout_marginTop="10dp"
-            android:text="Title"
+            tools:text="Title"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <TextView
@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/movie_title"
             android:layout_marginTop="5dp"
-            android:text="Overview" />
+            tools:text="Overview" />
 
     </RelativeLayout>
 </ScrollView>

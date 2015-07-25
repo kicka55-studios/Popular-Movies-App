@@ -8,8 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import in.kicka55studios.popularmovies.data.MoviesContract;
-
 public class MoviesAdapter extends CursorAdapter {
     public MoviesAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
@@ -24,6 +22,6 @@ public class MoviesAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         TextView tv = (TextView) view;
-        tv.setText(cursor.getString(cursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_TITLE)));
+        tv.setText(cursor.getString(MoviesFragment.COL_MOVIE_TITLE));
     }
 }

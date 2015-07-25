@@ -108,7 +108,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, Void> {
         String moviesJsonStr = null;
 
         String sortMethod = params[0];
-        int voteCountMin = 1000;
+        int voteCountMin = 2000;
         String apiKey = MoviesContract.API_KEY;
 
         try {
