@@ -21,19 +21,22 @@ import in.kicka55studios.popularmovies.data.MoviesContract;
 
 public class MoviesFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    static final int COL_ID = 0;
-    static final int COL_MOVIE_ID = 1;
-    static final int COL_MOVIE_TITLE = 2;
     private static final String[] MOVIES_COLUMNS = {
             MoviesContract.MoviesEntry._ID,
             MoviesContract.MoviesEntry.COLUMN_MOVIE_ID,
             MoviesContract.MoviesEntry.COLUMN_TITLE,
+            MoviesContract.MoviesEntry.COLUMN_POSTER_PATH
     };
+
+    static final int COL_ID = 0;
+    static final int COL_MOVIE_ID = 1;
+    static final int COL_MOVIE_TITLE = 2;
+    static final int COL_MOVIE_POSTER = 3;
+
     private static final int MOVIES_LOADER = 0;
 
     public static MoviesAdapter mMoviesAdapter;
     private ListView movieListView;
-
 
     public MoviesFragment() {
     }
