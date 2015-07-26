@@ -38,6 +38,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="in.kicka55studios.popularmovies.MainActivity" />
         </activity>
+        <service android:name=".service.MoviesService"/>
     </application>
 
 </manifest>

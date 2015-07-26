@@ -18,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import in.kicka55studios.popularmovies.data.MoviesContract;
+import in.kicka55studios.popularmovies.service.MoviesService;
 
 public class MoviesFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -79,9 +80,15 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     private void updateMovies() {
-        FetchMoviesTask moviesTask = new FetchMoviesTask(getActivity());
         String sort = Utility.getPreferredSort(getActivity());
-        moviesTask.execute(sort);
+
+//        FetchMoviesTask moviesTask = new FetchMoviesTask(getActivity());
+//        moviesTask.execute(sort);
+
+        Intent intent = new Intent(getActivity(), MoviesService.class);
+        intent.putExtra(MoviesService.SORT_ORDER_EXTRA, sort);
+
+        getActivity().startService(intent);
     }
 
     public void onSortChanged() {
