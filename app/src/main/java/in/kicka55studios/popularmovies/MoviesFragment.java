@@ -18,7 +18,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import in.kicka55studios.popularmovies.data.MoviesContract;
-import in.kicka55studios.popularmovies.service.MoviesService;
+import in.kicka55studios.popularmovies.sync.MoviesSyncAdapter;
 
 public class MoviesFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -78,9 +78,7 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     private void updateMovies() {
-        Intent intent = new Intent(getActivity(), MoviesService.class);
-        intent.putExtra(MoviesService.SORT_ORDER_EXTRA, Utility.getPreferredSort(getActivity()));
-        getActivity().startService(intent);
+        MoviesSyncAdapter.syncImmediately(getActivity());
     }
 
     public void onSortChanged() {

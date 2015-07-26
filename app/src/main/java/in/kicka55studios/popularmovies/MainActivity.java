@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import in.kicka55studios.popularmovies.sync.MoviesSyncAdapter;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,6 +27,8 @@ public class MainActivity extends AppCompatActivity {
                     MOVIESFRAGMENT_TAG)
                     .commit();
         }
+
+        MoviesSyncAdapter.initializeSyncAdapter(this);
     }
 
     @Override
